@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Delete;
         new Put(security: "is_granted('ROLE_SERVEUR') and object.getStatus() != 'payée'", securityMessage: 'You are not allowed to edit this order'),
         new Patch(security: "is_granted('ROLE_SERVEUR') and object.getStatus() != 'payée'", securityMessage: 'You are not allowed to edit this order'),
         new Patch(name: 'assign_command_to_barman', routeName: 'assign_command_to_barman'),
+        new Patch(name: 'command_is_ready', routeName: 'command_is_ready'),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],

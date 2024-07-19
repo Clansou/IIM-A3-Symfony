@@ -66,7 +66,6 @@ class UserController extends AbstractController
     )]
     public function assignCommandeToBarman(int $commandeId): JsonResponse
     {
-        // Récupérer le token de l'utilisateur
         $token = $this->tokenStorage->getToken();
         if (!$token) {
             throw new \Exception('No authentication token found.');
@@ -76,17 +75,46 @@ class UserController extends AbstractController
             throw new \Exception('User is not authorized to assign commands.');
         }
 
-        // Récupérer la commande
         $command = $this->entityManager->getRepository(Command::class)->find($commandeId);
         if (!$command) {
             throw new \Exception('Commande not found.');
         }
 
-        // Attribuer la commande au barman
         $command->setBarman($currentUser);
         $this->entityManager->flush();
 
         return new JsonResponse(['status' => 'Commande assigned successfully.']);
+    }
+
+    #[Route(
+        name: 'command_is_ready',
+        path: '/api/commands/{commandeId}/ready',
+        methods: ['PATCH']
+    )]
+    public function CommandIsReady(int $commandeId): JsonResponse
+    {
+        $token = $this->tokenStorage->getToken();
+        if (!$token) {
+            throw new \Exception('No authentication token found.');
+        }
+        $currentUser = $token->getUser();
+        if (!in_array('ROLE_BARMAN', $currentUser->getRoles())) {
+            throw new \Exception('User is not authorized to assign commands.');
+        }
+
+        $command = $this->entityManager->getRepository(Command::class)->find($commandeId);
+        if (!$command) {
+            throw new \Exception('Commande not found.');
+        }
+
+        if ($command->getBarman()->getId() != $currentUser->getId()) {
+            throw new \Exception('Le barman actuel ne correspond pas au barman assigné à la commande.');
+        }
+
+        $command->setStatus("prête");
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Commande is ready.']);
     }
 
     #[Route(
@@ -96,7 +124,6 @@ class UserController extends AbstractController
     )]
     public function createCommand(Request $request): JsonResponse
     {
-        // Récupérer le token de l'utilisateur
         $token = $this->tokenStorage->getToken();
         if (!$token) {
             throw new \Exception('No authentication token found.');
