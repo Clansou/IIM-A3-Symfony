@@ -132,7 +132,7 @@ class UserController extends AbstractController
             throw new \Exception('No authentication token found.');
         }
         $currentUser = $token->getUser();
-        if (!in_array('ROLE_SERVER', $currentUser->getRoles())) {
+        if (!in_array('ROLE_SERVEUR', $currentUser->getRoles())) {
             throw new \Exception('User is not authorized to assign commands.');
         }
 
