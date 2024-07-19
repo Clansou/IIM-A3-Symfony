@@ -15,8 +15,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 
+
+#[ApiFilter(DateFilter::class, properties: ['createdDate' => DateFilter::EXCLUDE_NULL])]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('ROLE_SERVEUR') or is_granted('ROLE_BARMAN') or is_granted('ROLE_PATRON')"),
