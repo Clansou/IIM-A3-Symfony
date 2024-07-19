@@ -11,7 +11,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']]
+    denormalizationContext: ['groups' => ['write']],
+    forceEager: false
 )]
 #[ORM\Entity(repositoryClass: DrinkRepository::class)]
 class Drink

@@ -29,7 +29,8 @@
         "symfony/serializer": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
         "symfony/validator": "7.1.*",
-        "symfony/yaml": "7.1.*"
+        "symfony/yaml": "7.1.*",
+        "vich/uploader-bundle": "*"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.60"
