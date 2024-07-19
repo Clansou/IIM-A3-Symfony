@@ -6,40 +6,54 @@ use App\Repository\CommandRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']]
+)]
 #[ORM\Entity(repositoryClass: CommandRepository::class)]
 class Command
 {
     #[ORM\Id]
+    #[Groups('read')]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(['read', 'write'])]
     private ?\DateTimeInterface $created_date = null;
 
     /**
      * @var Collection<int, Drink>
      */
     #[ORM\ManyToMany(targetEntity: Drink::class, inversedBy: 'commands')]
+    #[Groups(['read', 'write'])]
     private Collection $drinks;
 
     #[ORM\Column]
+    #[Groups(['read', 'write'])]
     private ?int $table_number = null;
 
     #[ORM\ManyToOne(inversedBy: 'commands')]
+    #[Groups(['read', 'write'])]
     private ?User $server = null;
 
     #[ORM\ManyToOne(inversedBy: 'commands')]
+    #[Groups(['read', 'write'])]
     private ?User $barman = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read', 'write'])]
     private ?string $status = null;
 
     public function __construct()
     {
         $this->drinks = new ArrayCollection();
+        $this->created_date = new \DateTime();
     }
 
     public function getId(): ?int
