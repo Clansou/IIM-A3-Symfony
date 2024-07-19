@@ -91,6 +91,7 @@ class UserController extends AbstractController
         path: '/api/commands/{commandeId}/ready',
         methods: ['PATCH']
     )]
+
     public function CommandIsReady(int $commandeId): JsonResponse
     {
         $token = $this->tokenStorage->getToken();
@@ -115,6 +116,38 @@ class UserController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse(['status' => 'Commande is ready.']);
+    }
+
+    #[Route(
+        name: 'paid_command',
+        path: '/api/commands/{commandeId}/paid',
+        methods: ['PATCH']
+    )]
+
+    public function CommandIsPaid(int $commandeId): JsonResponse
+    {
+        $token = $this->tokenStorage->getToken();
+        if (!$token) {
+            throw new \Exception('No authentication token found.');
+        }
+        $currentUser = $token->getUser();
+        if (!in_array('ROLE_SERVER', $currentUser->getRoles())) {
+            throw new \Exception('User is not authorized to assign commands.');
+        }
+
+        $command = $this->entityManager->getRepository(Command::class)->find($commandeId);
+        if (!$command) {
+            throw new \Exception('Commande not found.');
+        }
+
+        if($command->getStatus() === "payée"){
+            throw new \Exception('Commande already paid.');
+        }
+
+        $command->setStatus("payée");
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Commande is payed.']);
     }
 
     #[Route(
