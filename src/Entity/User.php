@@ -11,7 +11,23 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use App\State\UserPasswordHasherProcessor;
+
 #[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Post(processor: UserPasswordHasherProcessor::class),
+        new Get(),
+        new Put(processor: UserPasswordHasherProcessor::class),
+        new Patch(processor: UserPasswordHasherProcessor::class),
+        new Delete(),
+    ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']]
 )]
@@ -26,6 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('read')]
     private ?int $id = null;
 
+    #[Groups(['read','write'])]
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -40,8 +57,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(['read', 'write'])]
+    #[Groups('read')]
     private ?string $password = null;
+ 
+    #[Groups('write')]
+    private ?string $plainPassword = null;
 
     /**
      * @var Collection<int, Command>
@@ -118,6 +138,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->password = $password;
 
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+ 
+    public function setPlainPassword(string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+ 
         return $this;
     }
 
