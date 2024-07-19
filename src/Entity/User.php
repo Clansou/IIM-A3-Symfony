@@ -23,6 +23,7 @@ use App\State\UserPasswordHasherProcessor;
     operations: [
         new GetCollection(security: "is_granted('ROLE_PATRON')", securityMessage: 'You are not allowed to get users'),
         new Post(processor: UserPasswordHasherProcessor::class),
+        new Post(name: 'create_employee', routeName: 'create_employee'),
         new Get(security: "is_granted('ROLE_PATRON')", securityMessage: 'You are not allowed to get this user'),
         new Put(processor: UserPasswordHasherProcessor::class, security: "is_granted('ROLE_PATRON') or object == user", securityMessage: 'You are not allowed to edit this user'),
         new Patch(processor: UserPasswordHasherProcessor::class, security: "is_granted('ROLE_PATRON') or object == user", securityMessage: 'You are not allowed to edit this user'),
