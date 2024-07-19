@@ -21,8 +21,10 @@ use ApiPlatform\Metadata\Delete;
     operations: [
         new GetCollection(security: "is_granted('ROLE_SERVEUR') or is_granted('ROLE_BARMAN') or is_granted('ROLE_PATRON')"),
         new Get(security: "is_granted('ROLE_SERVEUR') or is_granted('ROLE_BARMAN') or is_granted('ROLE_PATRON')"),
+        new Post(name: 'create_command', routeName: 'create_command'),
         new Put(security: "is_granted('ROLE_SERVEUR') and object.getStatus() != 'payée'", securityMessage: 'You are not allowed to edit this order'),
         new Patch(security: "is_granted('ROLE_SERVEUR') and object.getStatus() != 'payée'", securityMessage: 'You are not allowed to edit this order'),
+        new Patch(name: 'assign_command_to_barman', routeName: 'assign_command_to_barman'),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],

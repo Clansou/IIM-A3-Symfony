@@ -2,6 +2,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Command;
+use DateTime;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -55,5 +58,64 @@ class UserController extends AbstractController
             $this->entityManager->flush();
         }
         return $user;
+    }
+    #[Route(
+        name: 'assign_command_to_barman',
+        path: '/api/commands/{commandeId}/assign',
+        methods: ['PATCH']
+    )]
+    public function assignCommandeToBarman(int $commandeId): JsonResponse
+    {
+        // Récupérer le token de l'utilisateur
+        $token = $this->tokenStorage->getToken();
+        if (!$token) {
+            throw new \Exception('No authentication token found.');
+        }
+        $currentUser = $token->getUser();
+        if (!in_array('ROLE_BARMAN', $currentUser->getRoles())) {
+            throw new \Exception('User is not authorized to assign commands.');
+        }
+
+        // Récupérer la commande
+        $command = $this->entityManager->getRepository(Command::class)->find($commandeId);
+        if (!$command) {
+            throw new \Exception('Commande not found.');
+        }
+
+        // Attribuer la commande au barman
+        $command->setBarman($currentUser);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Commande assigned successfully.']);
+    }
+
+    #[Route(
+        name: 'create_command',
+        path: '/api/commands',
+        methods: ['Post']
+    )]
+    public function createCommand(Request $request): JsonResponse
+    {
+        // Récupérer le token de l'utilisateur
+        $token = $this->tokenStorage->getToken();
+        if (!$token) {
+            throw new \Exception('No authentication token found.');
+        }
+        $currentUser = $token->getUser();
+        if (!in_array('ROLE_BARMAN', $currentUser->getRoles())) {
+            throw new \Exception('User is not authorized to assign commands.');
+        }
+
+        $requestData = json_decode($request->getContent(), true);
+
+        $command = new Command();
+        $command->setServer($currentUser);
+        $command->setTableNumber($requestData['table_number']);
+        $command->setCreatedDate(new DateTime());
+        $command->setStatus("en cours de préparation");
+        $this->entityManager->persist($command);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Commande assigned successfully.']);
     }
 }
