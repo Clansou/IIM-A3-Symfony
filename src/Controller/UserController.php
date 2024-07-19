@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Command;
+use App\Entity\Drink;
 use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -173,6 +174,13 @@ class UserController extends AbstractController
         $command->setTableNumber($requestData['table_number']);
         $command->setCreatedDate(new DateTime());
         $command->setStatus("en cours de préparation");
+        $drinksId = $requestData['drinks'] ?? [];
+        foreach ($drinksId as $drinkId){
+            $drink = $this->entityManager->getRepository(Drink::class)->find($drinkId);
+            if($drink != null){
+                $command->addDrink($drink);
+            }
+        }
         $this->entityManager->persist($command);
         $this->entityManager->flush();
 

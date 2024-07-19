@@ -45,7 +45,7 @@ class Command
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['read', 'write'])]
+    #[Groups('read')]
     private ?\DateTimeInterface $created_date = null;
 
     /**
@@ -60,15 +60,15 @@ class Command
     private ?int $table_number = null;
 
     #[ORM\ManyToOne(inversedBy: 'commands')]
-    #[Groups(['read', 'write'])]
+    #[Groups('read')]
     private ?User $server = null;
 
     #[ORM\ManyToOne(inversedBy: 'commands')]
-    #[Groups(['read', 'write'])]
+    #[Groups('read')]
     private ?User $barman = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['read', 'write'])]
+    #[Groups('read')]
     private ?string $status = null;
 
     public function __construct()
