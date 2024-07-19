@@ -10,9 +10,23 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+
 #[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('ROLE_SERVEUR') or is_granted('ROLE_BARMAN') or is_granted('ROLE_PATRON')"),
+        new Get(security: "is_granted('ROLE_SERVEUR') or is_granted('ROLE_BARMAN') or is_granted('ROLE_PATRON')"),
+        new Put(security: "is_granted('ROLE_SERVEUR') and object.getStatus() != 'payée'", securityMessage: 'You are not allowed to edit this order'),
+        new Patch(security: "is_granted('ROLE_SERVEUR') and object.getStatus() != 'payée'", securityMessage: 'You are not allowed to edit this order'),
+    ],
     normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']]
+    denormalizationContext: ['groups' => ['write']],
+    forceEager: false
 )]
 #[ORM\Entity(repositoryClass: CommandRepository::class)]
 class Command

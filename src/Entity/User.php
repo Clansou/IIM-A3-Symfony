@@ -23,13 +23,14 @@ use App\State\UserPasswordHasherProcessor;
     operations: [
         new GetCollection(security: "is_granted('ROLE_PATRON')", securityMessage: 'You are not allowed to get users'),
         new Post(processor: UserPasswordHasherProcessor::class),
-        new Get(security: "is_granted('ROLE_PATRON') or object == user", securityMessage: 'You are not allowed to get this user'),
+        new Get(security: "is_granted('ROLE_PATRON')", securityMessage: 'You are not allowed to get this user'),
         new Put(processor: UserPasswordHasherProcessor::class, security: "is_granted('ROLE_PATRON') or object == user", securityMessage: 'You are not allowed to edit this user'),
         new Patch(processor: UserPasswordHasherProcessor::class, security: "is_granted('ROLE_PATRON') or object == user", securityMessage: 'You are not allowed to edit this user'),
         new Delete(security: "is_granted('ROLE_PATRON') or object == user", securityMessage: 'You are not allowed to delete this user'),
     ],
     normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']]
+    denormalizationContext: ['groups' => ['write']],
+    forceEager: false
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -50,7 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(['read', 'write'])]
+    #[Groups(['read'])]
     private array $roles = [];
 
     /**

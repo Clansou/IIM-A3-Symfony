@@ -9,7 +9,22 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+
 #[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('ROLE_BARMAN')", securityMessage: 'You are not allowed to views the drinks'),
+        new Get(security: "is_granted('ROLE_BARMAN')", securityMessage: 'You are not allowed to view a drink'),
+        new Post(security: "is_granted('ROLE_BARMAN')", securityMessage: 'You are not allowed to create a drink'),
+        new Put(security: "is_granted('ROLE_BARMAN')", securityMessage: 'You are not allowed to edit this drink'),
+        new Patch(security: "is_granted('ROLE_BARMAN')", securityMessage: 'You are not allowed to edit this drink'),
+        new Delete(security: "is_granted('ROLE_BARMAN')", securityMessage: 'You are not allowed to delete this drink'),
+    ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
     forceEager: false
